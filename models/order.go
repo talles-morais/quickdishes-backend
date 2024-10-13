@@ -7,7 +7,7 @@ import (
 )
 
 type Order struct {
-	ID          string     `json:"id"           validate:"nonzero"`
+	ID          string     `json:"id"           validate:"nonzero" gorm:"primaryKey"`
 	Restaurant  Restaurant `json:"restaurant"   validate:"nonzero"`
 	Status      string     `json:"status"       validate:"nonzero"`
 	Pickup      bool       `json:"pickup"       validate:"nonzero"`

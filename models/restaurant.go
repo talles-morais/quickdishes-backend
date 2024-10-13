@@ -5,7 +5,7 @@ import (
 )
 
 type Restaurant struct {
-	CNPJ     string `json:"cnpj"     validate:"nonzero, len=14"`
+	CNPJ     string `json:"cnpj"     validate:"nonzero, len=14"  gorm:"primaryKey"`
 	Name     string `json:"name"     validate:"nonzero"`
 	Email    string `json:"email"    validate:"nonzero, regexp=^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})$"`
 	Password string `json:"password" validate:"nonzero"`
