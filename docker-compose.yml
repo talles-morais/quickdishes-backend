@@ -9,8 +9,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-      
+      - postgres-data:/var/lib/postgresql/data
   dcs-pgadmin:
     image: dpage/pgadmin4:latest
     container_name: dcs-pgadmin
@@ -21,10 +20,11 @@ services:
       PGADMIN_DEFAULT_EMAIL: root@email.com
       PGADMIN_DEFAULT_PASSWORD: 123456
     ports:
-      - 8080:80
+      - 8081:80
     volumes:
       - pgadmin-data:/var/lib/pgadmin
   
 volumes:
   pgadmin-data:
+  postgres-data:
     
