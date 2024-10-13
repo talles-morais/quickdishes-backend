@@ -7,8 +7,9 @@ import (
 )
 
 type Order struct {
-	ID          string     `json:"id"           validate:"nonzero" gorm:"primaryKey"`
-	Restaurant  Restaurant `json:"restaurant"   validate:"nonzero"`
+	OrderID     string     `json:"order_id"     validate:"nonzero" gorm:"primaryKey"`
+	Restaurant  Restaurant `json:"restaurant"   validate:"nonzero" gorm:"foreignKey:CNPJ"`
+	Products    []Product  `json:"products"     gorm:"many2many:order_products"`
 	Status      string     `json:"status"       validate:"nonzero"`
 	Pickup      bool       `json:"pickup"       validate:"nonzero"`
 	OrderedAt   time.Time  `json:"ordered_at"   validate:"nonzero"`
