@@ -45,7 +45,8 @@ func TestCreateRestaurant(t *testing.T) {
 		Address:  "Rua Principal, 123, Centro, Cidade - UF",
 		Phone:    "22909090808",
 	}
-
+	restaurantID = newRestaurant.CNPJ
+	
 	jsonData, err := json.Marshal(newRestaurant)
 	if err != nil {
 		t.Fatalf("error converting to json: %v", err)
