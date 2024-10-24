@@ -37,15 +37,52 @@ func CreateRestaurant(ctx *gin.Context) {
 		return
 	}
 
-	newRestaurant := models.Restaurant {
-		CNPJ: restaurant.CNPJ,
-		Name: restaurant.Name,
-		Email: restaurant.Email,
+	newRestaurant := models.Restaurant{
+		CNPJ:     restaurant.CNPJ,
+		Name:     restaurant.Name,
+		Email:    restaurant.Email,
 		Password: encryptedPassword,
-		Address: restaurant.Address,
-		Phone: restaurant.Phone,
+		Address:  restaurant.Address,
+		Phone:    restaurant.Phone,
 	}
 
 	database.DB.Create(&newRestaurant)
 	ctx.JSON(http.StatusCreated, newRestaurant)
+}
+
+func LoginRestaurant(ctx *gin.Context) {
+	var loginData struct {
+		CNPJ     string `json:"cnpj" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	// bind to struct
+	if err := ctx.ShouldBindJSON(&loginData); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// search on DB
+	var restaurant models.Restaurant
+	if err := database.DB.Where("cnpj = ?", loginData.CNPJ).First(&restaurant).Error; err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid cnpj or password",
+		})
+		return
+	}
+
+	// verify hashed password
+	if err := utils.VerifyPassword(restaurant.Password, loginData.Password); err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid password",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "login successful",
+		"restaurant": restaurant,
+	})
 }
