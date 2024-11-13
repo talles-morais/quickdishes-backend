@@ -154,7 +154,21 @@ func Restaurant(ctx *gin.Context) {
 		return
 	}
 
+	type RestaurantResponse struct {
+		CNPJ  string `json:"cnpj"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Phone string `json:"phone"`
+	}
+
+	response := RestaurantResponse{
+		CNPJ:  restaurant.CNPJ,
+		Name:  restaurant.Name,
+		Email: restaurant.Email,
+		Phone: restaurant.Phone,
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"claims": restaurant,
+		"restaurant": response,
 	})
 }
