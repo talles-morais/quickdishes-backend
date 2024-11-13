@@ -10,11 +10,15 @@ import (
 
 func Router() {
 	router := gin.Default()
+
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
+	config.AllowCredentials = true
 	router.Use(cors.New(config))
+
 	router.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"hello": "world"}) })
 	router.POST("/login", auth.LoginRestaurant)
 	router.POST("/signup", auth.CreateRestaurant)
+	router.GET("/restaurant", auth.Restaurant)
 	router.Run()
 }

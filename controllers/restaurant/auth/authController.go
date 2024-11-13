@@ -85,9 +85,10 @@ func LoginRestaurant(ctx *gin.Context) {
 		return
 	}
 
+	expTime := time.Now().Add(time.Hour * 24).Unix()
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"cnpj": restaurant.CNPJ,
-		"exp":  time.Now().Add(time.Hour * 24).Unix(), // 1 day
+		"exp":  expTime, // 1 day
 	})
 
 	token, err := claims.SignedString([]byte(secretKey))
@@ -99,9 +100,61 @@ func LoginRestaurant(ctx *gin.Context) {
 		return
 	}
 
+	ctx.SetCookie(
+		"jwt",        // name
+		token,        // value
+		int(expTime), // maxAge
+		"/",          // path
+		"localhost",  // domain
+		false,        // secure
+		true,         // httpOnly
+	)
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"message":    "login successful",
-		"restaurant": restaurant,
-		"jwt-token":  token,
+		"message": "login successful",
+	})
+}
+
+func Restaurant(ctx *gin.Context) {
+	cookie, err := ctx.Cookie("jwt")
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "authentication required",
+		})
+		return
+	}
+
+	token, err := jwt.ParseWithClaims(cookie, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid token",
+		})
+		return
+	}
+
+	claims, ok := token.Claims.(*jwt.MapClaims)
+	if !ok {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "could not parse claims",
+		})
+		return
+	}
+
+	cnpj := (*claims)["cnpj"].(string)
+
+	var restaurant models.Restaurant
+	if err := database.DB.Where("cnpj = ?", cnpj).First(&restaurant).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "restaurant not found",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"claims": restaurant,
 	})
 }
