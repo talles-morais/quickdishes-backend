@@ -172,3 +172,19 @@ func Restaurant(ctx *gin.Context) {
 		"restaurant": response,
 	})
 }
+
+func Logout(ctx *gin.Context) {
+	ctx.SetCookie(
+		"jwt",       // name
+		"",          // value
+		-1,          // maxAge
+		"/",         // path
+		"localhost", // domain
+		false,       // secure
+		true,        // httpOnly
+	)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "successfull logout",
+	})
+}

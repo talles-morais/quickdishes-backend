@@ -20,5 +20,6 @@ func Router() {
 	router.POST("/login", auth.LoginRestaurant)
 	router.POST("/signup", auth.CreateRestaurant)
 	router.GET("/restaurant", auth.Restaurant)
+	router.POST("/logout", auth.Logout)
 	router.Run()
 }
