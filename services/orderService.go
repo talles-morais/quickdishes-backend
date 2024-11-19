@@ -27,9 +27,8 @@ func CreateNewOrder(ctx *gin.Context) *AppError {
 	return nil
 }
 
-func DeleteOrder(ctx *gin.Context) *AppError {
+func DeleteOrder(orderId string) *AppError {
 	var order models.Order
-	orderId := ctx.Param("id")
 	result := database.DB.Where("order_id = ?", orderId).Delete(&order)
 
 	if result.RowsAffected == 0 {
@@ -42,9 +41,8 @@ func DeleteOrder(ctx *gin.Context) *AppError {
 	return nil
 }
 
-func GetOrderById(ctx *gin.Context) (*models.Order, *AppError) {
+func GetOrderById(orderId string) (*models.Order, *AppError) {
 	var order models.Order
-	orderId := ctx.Param("id")
 
 	if err := database.DB.Preload("Products").First(&order, "order_id = ?", orderId).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -62,7 +60,7 @@ func GetOrderById(ctx *gin.Context) (*models.Order, *AppError) {
 	return &order, nil
 }
 
-func GetAllOrders(ctx *gin.Context) ([]models.Order, *AppError) {
+func GetAllOrders() ([]models.Order, *AppError) {
 	var orders []models.Order
 
 	if err := database.DB.Preload("Products").Find(&orders).Error; err != nil {
@@ -72,4 +70,37 @@ func GetAllOrders(ctx *gin.Context) ([]models.Order, *AppError) {
 		}
 	}
 	return orders, nil
+}
+
+func UpdateOrder(orderId string, updatedOrder models.Order) (*models.Order, *AppError) {
+	var order models.Order
+
+	if err := database.DB.First(&order, "order_id = ?", orderId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &AppError{
+				Status:  http.StatusNotFound,
+				Message: "Order not found",
+			}
+		}
+		return nil, &AppError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	if err := database.DB.Model(&order).Updates(updatedOrder).Error; err != nil {
+		return nil, &AppError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	if err := database.DB.Model(&order).UpdateColumn("pickup", updatedOrder.Pickup).Error; err != nil {
+		return nil, &AppError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	return &order, nil
 }

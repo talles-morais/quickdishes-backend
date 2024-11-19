@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/talles-morais/quick-dishes/models"
 	"github.com/talles-morais/quick-dishes/services"
 )
 
@@ -18,7 +19,9 @@ func CreateOrder(ctx *gin.Context) {
 }
 
 func DeleteOrder(ctx *gin.Context) {
-	if err := services.DeleteOrder(ctx); err != nil {
+	orderId := ctx.Param("id")
+
+	if err := services.DeleteOrder(orderId); err != nil {
 		ctx.JSON(err.Status, gin.H{
 			"error": err.Message,
 		})
@@ -28,7 +31,9 @@ func DeleteOrder(ctx *gin.Context) {
 }
 
 func GetOrderById(ctx *gin.Context) {
-	order, err := services.GetOrderById(ctx)
+	orderId := ctx.Param("id")
+
+	order, err := services.GetOrderById(orderId)
 	if err != nil {
 		ctx.JSON(err.Status, gin.H{
 			"error": err.Message,
@@ -39,7 +44,7 @@ func GetOrderById(ctx *gin.Context) {
 }
 
 func GetAllOrders(ctx *gin.Context) {
-	orders, err := services.GetAllOrders(ctx)
+	orders, err := services.GetAllOrders()
 	if err != nil {
 		ctx.JSON(err.Status, gin.H{
 			"error": err.Message,
@@ -47,4 +52,26 @@ func GetAllOrders(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, orders)
+}
+
+func UpdateOrder(ctx *gin.Context) {
+	orderId := ctx.Param("id")
+	var updatedOrder models.Order
+
+	if err := ctx.ShouldBindJSON(&updatedOrder); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid input data",
+		})
+		return
+	}
+
+	order, appErr := services.UpdateOrder(orderId, updatedOrder)
+	if appErr != nil {
+		ctx.JSON(appErr.Status, gin.H{
+			"error": appErr.Message,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, order)
 }
