@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/talles-morais/quick-dishes/controllers/restaurant/auth"
+	"github.com/talles-morais/quick-dishes/controllers/restaurant"
 	"github.com/talles-morais/quick-dishes/database"
 	"github.com/talles-morais/quick-dishes/models"
 	"github.com/talles-morais/quick-dishes/utils"
@@ -56,7 +56,7 @@ func TestCreateRestaurant(t *testing.T) {
 	}
 
 	r := SetupRouter()
-	r.POST("/signup", auth.CreateRestaurant)
+	r.POST("/signup", restaurant.CreateRestaurant)
 
 	req, _ := http.NewRequest("POST", "/signup", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
@@ -86,7 +86,7 @@ func TestLoginRestaurant(t *testing.T) {
 	}
 
 	r := SetupRouter()
-	r.POST("/login", auth.LoginRestaurant)
+	r.POST("/login", restaurant.LoginRestaurant)
 
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")

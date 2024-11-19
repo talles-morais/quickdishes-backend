@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/talles-morais/quick-dishes/controllers/restaurant/auth"
+	"github.com/talles-morais/quick-dishes/controllers/restaurant"
 )
 
 func Router() {
@@ -17,9 +17,9 @@ func Router() {
 	router.Use(cors.New(config))
 
 	router.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"hello": "world"}) })
-	router.POST("/login", auth.LoginRestaurant)
-	router.POST("/signup", auth.CreateRestaurant)
-	router.GET("/restaurant", auth.Restaurant)
-	router.POST("/logout", auth.Logout)
+	router.POST("/login", restaurant.LoginRestaurant)
+	router.POST("/signup", restaurant.CreateRestaurant)
+	router.GET("/restaurant", restaurant.Restaurant)
+	router.POST("/logout", restaurant.Logout)
 	router.Run()
 }
