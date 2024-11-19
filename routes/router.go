@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/talles-morais/quick-dishes/controllers/order"
 	"github.com/talles-morais/quick-dishes/controllers/restaurant"
 )
 
@@ -21,5 +22,7 @@ func Router() {
 	router.POST("/signup", restaurant.CreateRestaurant)
 	router.GET("/restaurant", restaurant.Restaurant)
 	router.POST("/logout", restaurant.Logout)
+
+	router.POST("/order", order.CreateOrder)
 	router.Run()
 }
