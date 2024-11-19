@@ -54,10 +54,22 @@ func GetOrderById(ctx *gin.Context) (*models.Order, *AppError) {
 			}
 		}
 		return nil, &AppError{
-			Status: http.StatusInternalServerError, 
+			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
 
 	return &order, nil
+}
+
+func GetAllOrders(ctx *gin.Context) ([]models.Order, *AppError) {
+	var orders []models.Order
+
+	if err := database.DB.Preload("Products").Find(&orders).Error; err != nil {
+		return nil, &AppError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return orders, nil
 }

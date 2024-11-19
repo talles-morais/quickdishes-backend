@@ -37,3 +37,14 @@ func GetOrderById(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, order)
 }
+
+func GetAllOrders(ctx *gin.Context) {
+	orders, err := services.GetAllOrders(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, gin.H{
+			"error": err.Message,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, orders)
+}
