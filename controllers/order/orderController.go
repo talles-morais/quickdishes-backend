@@ -16,3 +16,13 @@ func CreateOrder(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"message": "Order created successfully"})
 }
+
+func DeleteOrder(ctx *gin.Context) {
+	if err := services.DeleteOrder(ctx); err != nil {
+		ctx.JSON(err.Status, gin.H{
+			"error": err.Message,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Order deleted successfully"})
+}

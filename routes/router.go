@@ -24,5 +24,6 @@ func Router() {
 	router.POST("/logout", restaurant.Logout)
 
 	router.POST("/order", order.CreateOrder)
+	router.DELETE("/order/:id", order.DeleteOrder)
 	router.Run()
 }

@@ -24,3 +24,18 @@ func CreateNewOrder(ctx *gin.Context) *AppError {
 	}
 	return nil
 }
+
+func DeleteOrder(ctx *gin.Context) *AppError {
+	var order models.Order
+	orderId := ctx.Param("id")
+	result := database.DB.Where("order_id = ?", orderId).Delete(&order)
+
+	if result.RowsAffected == 0 {
+		return &AppError{Status: http.StatusNotFound, Message: "Order not found"}
+	}
+
+	if result.Error != nil {
+		return &AppError{Status: http.StatusBadRequest, Message: result.Error.Error()}
+	}
+	return nil
+}
