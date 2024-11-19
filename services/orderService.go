@@ -1,11 +1,13 @@
 package services
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/talles-morais/quick-dishes/database"
 	"github.com/talles-morais/quick-dishes/models"
+	"gorm.io/gorm"
 )
 
 func CreateNewOrder(ctx *gin.Context) *AppError {
@@ -38,4 +40,24 @@ func DeleteOrder(ctx *gin.Context) *AppError {
 		return &AppError{Status: http.StatusBadRequest, Message: result.Error.Error()}
 	}
 	return nil
+}
+
+func GetOrderById(ctx *gin.Context) (*models.Order, *AppError) {
+	var order models.Order
+	orderId := ctx.Param("id")
+
+	if err := database.DB.Preload("Products").First(&order, "order_id = ?", orderId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &AppError{
+				Status:  http.StatusNotFound,
+				Message: "Order not found",
+			}
+		}
+		return nil, &AppError{
+			Status: http.StatusInternalServerError, 
+			Message: err.Error(),
+		}
+	}
+
+	return &order, nil
 }

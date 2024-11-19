@@ -23,6 +23,7 @@ func Router() {
 	router.GET("/restaurant", restaurant.Restaurant)
 	router.POST("/logout", restaurant.Logout)
 
+	router.GET("/order/:id", order.GetOrderById)
 	router.POST("/order", order.CreateOrder)
 	router.DELETE("/order/:id", order.DeleteOrder)
 	router.Run()
