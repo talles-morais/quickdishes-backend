@@ -44,7 +44,7 @@ func DeleteOrder(orderId string) *AppError {
 func GetOrderById(orderId string) (*models.Order, *AppError) {
 	var order models.Order
 
-	if err := database.DB.Preload("Products").First(&order, "order_id = ?", orderId).Error; err != nil {
+	if err := database.DB.Preload("Client").Preload("Products").First(&order, "order_id = ?", orderId).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &AppError{
 				Status:  http.StatusNotFound,
@@ -63,7 +63,7 @@ func GetOrderById(orderId string) (*models.Order, *AppError) {
 func GetAllOrders() ([]models.Order, *AppError) {
 	var orders []models.Order
 
-	if err := database.DB.Preload("Products").Find(&orders).Error; err != nil {
+	if err := database.DB.Preload("Client").Preload("Products").Find(&orders).Error; err != nil {
 		return nil, &AppError{
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),

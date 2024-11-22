@@ -9,6 +9,8 @@ import (
 type Order struct {
 	OrderID     string    `json:"order_id"     validate:"nonzero" gorm:"primaryKey"`
 	Restaurant  string    `json:"restaurant"   validate:"nonzero"`
+	ClientID    string    `json:"-" gorm:"not null"`
+	Client      Client    `json:"client" gorm:"foreignKey:ClientID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Products    []Product `json:"products"     gorm:"many2many:order_products;joinForeignKey:OrderID;joinReferences:ProductID;constraint:OnDelete:CASCADE;"`
 	Status      string    `json:"status"       validate:"nonzero"`
 	Pickup      bool      `json:"pickup"`
