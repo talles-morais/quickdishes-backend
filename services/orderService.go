@@ -91,6 +91,18 @@ func GetAllOrders() ([]models.Order, *AppError) {
 	return orders, nil
 }
 
+func GetAllOrdersByRestaurant(restaurantId string) ([]models.Order, *AppError) {
+	var orders []models.Order
+
+	if err := database.DB.Preload("Client").Preload("Products").Where("restaurant = ?", restaurantId).Find(&orders).Error; err != nil {
+		return nil, &AppError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return orders, nil
+}
+
 func UpdateOrder(orderId string, updatedOrder models.Order) (*models.Order, *AppError) {
 	var order models.Order
 

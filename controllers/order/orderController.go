@@ -54,6 +54,19 @@ func GetAllOrders(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, orders)
 }
 
+func GetAllOrdersByRestaurant(ctx *gin.Context) {
+	restaurantId := ctx.Param("id")
+	orders, err := services.GetAllOrdersByRestaurant(restaurantId)
+
+	if err != nil {
+		ctx.JSON(err.Status, gin.H{
+			"error": err.Message,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, orders)
+}
+
 func UpdateOrder(ctx *gin.Context) {
 	orderId := ctx.Param("id")
 	var updatedOrder models.Order
