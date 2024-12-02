@@ -7,15 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/talles-morais/quick-dishes/controllers/order"
 	"github.com/talles-morais/quick-dishes/controllers/restaurant"
+	"github.com/talles-morais/quick-dishes/services"
 )
 
 func Router() {
 	router := gin.Default()
 
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowCredentials = true
+	config := cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}
 	router.Use(cors.New(config))
+
+	router.GET("/ws", func(ctx *gin.Context) {
+		services.HandleWebSocket(ctx)
+	})
 
 	router.GET("/", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"hello": "world"}) })
 	router.POST("/login", restaurant.LoginRestaurant)
@@ -28,5 +36,7 @@ func Router() {
 	router.GET("/orders", order.GetAllOrders)
 	router.PUT("/order/:id", order.UpdateOrder)
 	router.DELETE("/order/:id", order.DeleteOrder)
+
+	go services.StartBroadcast()
 	router.Run()
 }

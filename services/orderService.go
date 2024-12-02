@@ -10,6 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type Message struct {
+	Action string       `json:"action"`
+	Order  models.Order `json:"order"`
+}
+
 func CreateNewOrder(ctx *gin.Context) *AppError {
 	var order models.Order
 
@@ -24,20 +29,34 @@ func CreateNewOrder(ctx *gin.Context) *AppError {
 	if err := database.DB.Create(&order).Error; err != nil {
 		return &AppError{Status: http.StatusInternalServerError, Message: "Failed to create order"}
 	}
+
+	broadcast <- map[string]interface{}{
+		"action": "create",
+		"order":  order,
+	}
+
 	return nil
 }
 
 func DeleteOrder(orderId string) *AppError {
 	var order models.Order
-	result := database.DB.Where("order_id = ?", orderId).Delete(&order)
+	result := database.DB.Where("order_id = ?", orderId).First(&order)
 
 	if result.RowsAffected == 0 {
 		return &AppError{Status: http.StatusNotFound, Message: "Order not found"}
 	}
 
+	result = database.DB.Where("order_id = ?", orderId).Delete(&order)
+
 	if result.Error != nil {
 		return &AppError{Status: http.StatusBadRequest, Message: result.Error.Error()}
 	}
+
+	broadcast <- map[string]interface{}{
+		"action": "delete",
+		"order":  order,
+	}
+
 	return nil
 }
 
